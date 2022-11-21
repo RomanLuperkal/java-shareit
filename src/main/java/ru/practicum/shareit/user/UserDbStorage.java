@@ -5,7 +5,7 @@ import ru.practicum.shareit.user.model.User;
 import java.util.List;
 
 public interface UserDbStorage {
-    User createUser (User user);
+    User createUser(User user);
 
     User getUserById(Long id);
 
@@ -13,5 +13,5 @@ public interface UserDbStorage {
 
     User updateUser(User user, Long userId);
 
-    void deleteUser (Long id);
+    void deleteUser(Long id);
 }

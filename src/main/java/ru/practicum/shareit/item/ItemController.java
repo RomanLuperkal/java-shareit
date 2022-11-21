@@ -23,8 +23,8 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public ResponseEntity<ItemDto> createItem (@RequestHeader("X-Sharer-User-Id") Long userId,
-                                               @Valid @RequestBody ItemDto itemDto) {
+    public ResponseEntity<ItemDto> createItem(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                              @Valid @RequestBody ItemDto itemDto) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Mapper.mapToItemDto(itemService.createItem(Mapper.mapToItem(itemDto), userId)));
     }

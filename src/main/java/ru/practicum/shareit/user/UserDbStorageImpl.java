@@ -10,7 +10,7 @@ import java.util.*;
 
 @Repository
 @Slf4j
-public class UserDbStorageImpl implements UserDbStorage{
+public class UserDbStorageImpl implements UserDbStorage {
     private final Map<Long, User> users;
     private Long counterId;
 
@@ -45,7 +45,7 @@ public class UserDbStorageImpl implements UserDbStorage{
     @Override
     public User updateUser(User user, Long userId) {
         if (users.get(userId) == null) {
-           throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователя с id=" + userId + " нет");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователя с id=" + userId + " нет");
         }
         validateUser(user);
         user.setId(userId);

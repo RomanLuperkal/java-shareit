@@ -9,7 +9,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
     private final UserDbStorage users;
 
     @Override
