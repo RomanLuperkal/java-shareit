@@ -92,8 +92,8 @@ public class ItemDbStorageImpl implements ItemDbStorage {
     private void checkOwner(Long itemId, User user) {
         if (items.get(user.getId()) == null || items.get(user.getId()).stream().noneMatch(i -> i.getId().equals(itemId))) {
             log.info("Вещь с id={} не пренадлежит пользователю с id={}", itemId, user.getId());
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND
-                    , "Вещь с id=" + itemId + " не пренадлежит пользователю с id=" + user.getId());
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Вещь с id=" + itemId + " не пренадлежит пользователю с id=" + user.getId());
         }
     }
 }
