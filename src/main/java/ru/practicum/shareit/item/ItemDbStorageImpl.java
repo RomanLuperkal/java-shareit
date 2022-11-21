@@ -12,8 +12,8 @@ import java.util.stream.Collectors;
 
 @Repository
 @Slf4j
-public class ItemDbStorageImpl implements ItemDbStorage{
-    private final Map<Long, List<Item>>  items;
+public class ItemDbStorageImpl implements ItemDbStorage {
+    private final Map<Long, List<Item>> items;
     private Long counterId;
 
     public ItemDbStorageImpl() {
@@ -25,7 +25,7 @@ public class ItemDbStorageImpl implements ItemDbStorage{
     public Item createItem(Item item, User user) {
         item.setId(getId());
         item.setOwner(user);
-        items.compute(user.getId(), (k,v) -> {
+        items.compute(user.getId(), (k, v) -> {
             if (v == null) {
                 v = new ArrayList<>();
             }
@@ -66,7 +66,7 @@ public class ItemDbStorageImpl implements ItemDbStorage{
                 .map(list -> list.stream().filter(i -> i.getId().equals(itemId)).findFirst().orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Предмета с id=" + itemId + " нет")))
                 .findFirst().get();
-        }
+    }
 
     @Override
     public List<Item> getPersonalItems(Long userId) {
@@ -78,9 +78,9 @@ public class ItemDbStorageImpl implements ItemDbStorage{
         String search = text.toLowerCase();
         List<Item> result = new ArrayList<>();
         items.values().forEach(itemsList -> result.addAll(
-                        itemsList.stream().filter(item -> (item.getDescription().toLowerCase().contains(search)
-                                        || item.getName().toLowerCase().contains(search)) && item.getAvailable())
-                                .collect(Collectors.toList())));
+                itemsList.stream().filter(item -> (item.getDescription().toLowerCase().contains(search)
+                                || item.getName().toLowerCase().contains(search)) && item.getAvailable())
+                        .collect(Collectors.toList())));
         return result;
     }
 
