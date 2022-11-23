@@ -3,9 +3,10 @@ package ru.practicum.shareit.user;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -13,23 +14,23 @@ public class UserServiceImpl implements UserService {
     private final UserDbStorage users;
 
     @Override
-    public User createUser(User user) {
-        return users.createUser(user);
+    public UserDto createUser(UserDto user) {
+        return UserMapper.mapper.mapToUserDto(users.createUser(UserMapper.mapper.mapToUser(user)));
     }
 
     @Override
-    public User getUserById(Long id) {
-        return users.getUserById(id);
+    public UserDto getUserById(Long id) {
+        return UserMapper.mapper.mapToUserDto(users.getUserById(id));
     }
 
     @Override
-    public List<User> getUsers() {
-        return users.getUsers();
+    public List<UserDto> getUsers() {
+        return users.getUsers().stream().map(UserMapper.mapper::mapToUserDto).collect(Collectors.toList());
     }
 
     @Override
-    public User updateUser(User user, Long userId) {
-        return users.updateUser(user, userId);
+    public UserDto updateUser(UserDto user, Long userId) {
+        return UserMapper.mapper.mapToUserDto(users.updateUser(UserMapper.mapper.mapToUser(user), userId));
     }
 
     @Override

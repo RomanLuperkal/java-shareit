@@ -6,12 +6,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.mapper.Mapper;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * TODO Sprint add-controllers.
@@ -26,7 +24,7 @@ public class ItemController {
     public ResponseEntity<ItemDto> createItem(@RequestHeader("X-Sharer-User-Id") Long userId,
                                               @Valid @RequestBody ItemDto itemDto) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Mapper.mapToItemDto(itemService.createItem(Mapper.mapToItem(itemDto), userId)));
+                .body(itemService.createItem(itemDto, userId));
     }
 
     @PatchMapping("{itemId}")
@@ -34,25 +32,24 @@ public class ItemController {
                                               @RequestBody ItemDto itemDto,
                                               @PathVariable Long itemId) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(Mapper.mapToItemDto(itemService.updateItem(itemId, userId, Mapper.mapToItem(itemDto))));
+                .body(itemService.updateItem(itemId, userId, itemDto));
     }
 
     @GetMapping("{itemId}")
     public ResponseEntity<ItemDto> getItemByItemId(@PathVariable Long itemId) {
-        return ResponseEntity.status(HttpStatus.OK).body(Mapper.mapToItemDto(itemService.getItemByItemId(itemId)));
+        return ResponseEntity.status(HttpStatus.OK).body(itemService.getItemByItemId(itemId));
     }
 
     @GetMapping
     public ResponseEntity<List<ItemDto>> getPersonalItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(itemService.getPersonalItems(userId).stream()
-                        .map(Mapper::mapToItemDto).collect(Collectors.toList()));
+                .body(itemService.getPersonalItems(userId));
     }
 
     @GetMapping("search")
     public ResponseEntity<List<ItemDto>> getFoundItems(@RequestParam String text) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(itemService.getFoundItems(text).stream().map(Mapper::mapToItemDto).collect(Collectors.toList()));
+                .body(itemService.getFoundItems(text));
     }
 
 }
