@@ -6,10 +6,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemListDto;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
-import java.util.List;
 
 /**
  * TODO Sprint add-controllers.
@@ -41,13 +41,13 @@ public class ItemController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ItemDto>> getPersonalItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ResponseEntity<ItemListDto> getPersonalItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(itemService.getPersonalItems(userId));
     }
 
     @GetMapping("search")
-    public ResponseEntity<List<ItemDto>> getFoundItems(@RequestParam String text) {
+    public ResponseEntity<ItemListDto> getFoundItems(@RequestParam String text) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(itemService.getFoundItems(text));
     }
