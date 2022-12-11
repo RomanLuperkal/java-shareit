@@ -12,24 +12,24 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findAllByBookerIdOrderByStartDesc(Long bookerId);
 
     List<Booking> findAllByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(
-            Long booker_id, LocalDateTime start, LocalDateTime end);
+            Long bookerId, LocalDateTime start, LocalDateTime end);
 
-    List<Booking> findAllByBookerIdAndEndIsBeforeOrderByStartDesc(Long booker_id, LocalDateTime end);
+    List<Booking> findAllByBookerIdAndEndIsBeforeOrderByStartDesc(Long bookerId, LocalDateTime end);
 
-    List<Booking> findAllByBookerIdAndStartIsAfterOrderByStartDesc(Long booker_id, LocalDateTime start);
+    List<Booking> findAllByBookerIdAndStartIsAfterOrderByStartDesc(Long bookerId, LocalDateTime start);
 
-    List<Booking> findAllByBookerIdAndStatusIsOrderByStartDesc(Long booker_id, Status status);
+    List<Booking> findAllByBookerIdAndStatusIsOrderByStartDesc(Long bookerId, Status status);
 
-    List<Booking> findAllByItemIdInOrderByStartDesc(Collection<Long> item_id);
+    List<Booking> findAllByItemIdInOrderByStartDesc(Collection<Long> itemId);
 
     List<Booking> findAllByItemIdInAndStartIsBeforeAndEndIsAfterOrderByStartDesc(
-            Collection<Long> item_id, LocalDateTime start, LocalDateTime end);
+            Collection<Long> itemId, LocalDateTime start, LocalDateTime end);
 
-    List<Booking> findAllByItemIdInAndEndIsBeforeOrderByStartDesc(Collection<Long> item_id, LocalDateTime end);
+    List<Booking> findAllByItemIdInAndEndIsBeforeOrderByStartDesc(Collection<Long> itemId, LocalDateTime end);
 
-    List<Booking> findAllByItemIdInAndStartIsAfterOrderByStartDesc(Collection<Long> item_id, LocalDateTime start);
+    List<Booking> findAllByItemIdInAndStartIsAfterOrderByStartDesc(Collection<Long> itemId, LocalDateTime start);
 
-    List<Booking> findAllByItemIdInAndStatusIsOrderByStartDesc(Collection<Long> item_id, Status status);
+    List<Booking> findAllByItemIdInAndStatusIsOrderByStartDesc(Collection<Long> itemId, Status status);
 
     @Query(value = "SELECT * FROM bookings WHERE (item_id = ?1 AND start_date < NOW()) " +
             "ORDER BY start_date DESC LIMIT 1", nativeQuery = true)
@@ -40,5 +40,5 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Booking findNextBooking(Long itemId);
 
     Boolean existsBookingByItemIdAndBookerIdAndStatusAndEndIsBefore(
-            Long item_id, Long booker_id, Status status, LocalDateTime end);
+            Long itemId, Long bookerId, Status status, LocalDateTime end);
 }
