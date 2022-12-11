@@ -1,17 +1,16 @@
 package ru.practicum.shareit.user.dto;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 
 import javax.validation.constraints.*;
 
-@Data
 @Builder
-public class UserDto {
+@Getter
+public class UserDtoUpdate {
     @Pattern(regexp = "^\\w+.*\\S$", message = "Неккоректное имя")
     @Size(max = 255)
     private String name;
     @Email(message = "Некорректный email")
-    @NotNull(message = "Поле email обязательно")
     private String email;
 }
