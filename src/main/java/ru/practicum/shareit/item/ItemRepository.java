@@ -13,6 +13,8 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
 
     Boolean existsItemByOwnerId(Long ownerId);
 
-    @Query(value = "SELECT item_id FROM items WHERE owner_id = ?1", nativeQuery = true)
+    @Query("SELECT i.id FROM Item AS i " +
+            "JOIN User As u ON i.owner.id=u.id" +
+            " WHERE i.owner.id = ?1")
     List<Long> findAllItemIdByOwnerId(Long ownerId);
 }
