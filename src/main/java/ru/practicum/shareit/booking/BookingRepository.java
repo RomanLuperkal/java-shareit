@@ -1,7 +1,6 @@
 package ru.practicum.shareit.booking;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.booking.model.Booking;
 
 import java.time.LocalDateTime;
@@ -31,13 +30,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findAllByItemIdInAndStatusIsOrderByStartDesc(Collection<Long> itemId, Status status);
 
-    @Query(value = "SELECT * FROM bookings WHERE (item_id = ?1 AND start_date < NOW()) " +
-            "ORDER BY start_date DESC LIMIT 1", nativeQuery = true)
-    Booking findLastBooking(Long itemId);
+    Booking findFirstByItemIdAndEndBeforeAndStatusOrderByEndDesc(Long itemId, LocalDateTime end, Status status); // постман требует от меня null
 
-    @Query(value = "SELECT * FROM bookings WHERE (item_id = ?1 AND start_date > NOW()) " +
-            "ORDER BY start_date ASC LIMIT 1", nativeQuery = true)
-    Booking findNextBooking(Long itemId);
+    Booking findFirstByItemIdAndStartAfterAndStatusOrderByStartAsc(Long itemId, LocalDateTime start, Status status);
 
     Boolean existsBookingByItemIdAndBookerIdAndStatusAndEndIsBefore(
             Long itemId, Long bookerId, Status status, LocalDateTime end);

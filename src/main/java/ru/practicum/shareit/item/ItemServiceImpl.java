@@ -57,8 +57,15 @@ public class ItemServiceImpl implements ItemService {
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Предмета с id=" + itemId + " нет"));
         ItemDtoResponse itemDtoResponse = mapper.mapToItemDtoResponse(item);
         if (item.getOwner().getId().equals(userId)) {
-            itemDtoResponse.setLastBooking(mapper.mapToBookingShortDto(bookings.findLastBooking(itemId)));
-            itemDtoResponse.setNextBooking(mapper.mapToBookingShortDto(bookings.findNextBooking(itemId)));
+            itemDtoResponse.setLastBooking(mapper
+                    .mapToBookingShortDto(bookings
+                            .findFirstByItemIdAndEndBeforeAndStatusOrderByEndDesc(
+                                    itemId, LocalDateTime.now(), Status.APPROVED)
+                    ));
+            itemDtoResponse.setNextBooking(mapper.mapToBookingShortDto(bookings
+                    .findFirstByItemIdAndStartAfterAndStatusOrderByStartAsc(
+                            itemId, LocalDateTime.now(), Status.APPROVED)
+            ));
             return itemDtoResponse;
         }
         return itemDtoResponse;
@@ -73,8 +80,12 @@ public class ItemServiceImpl implements ItemService {
         List<ItemDtoResponse> personalItems = items.findAllByOwnerId(userId).stream()
                 .map(mapper::mapToItemDtoResponse).collect(Collectors.toList());
         for (ItemDtoResponse item : personalItems) {
-            item.setLastBooking(mapper.mapToBookingShortDto(bookings.findLastBooking(item.getId())));
-            item.setNextBooking(mapper.mapToBookingShortDto(bookings.findNextBooking(item.getId())));
+            item.setLastBooking(mapper.mapToBookingShortDto(bookings.findFirstByItemIdAndEndBeforeAndStatusOrderByEndDesc(
+                    item.getId(), LocalDateTime.now(), Status.APPROVED)));
+            item.setNextBooking(mapper.mapToBookingShortDto(bookings
+                    .findFirstByItemIdAndStartAfterAndStatusOrderByStartAsc(
+                            item.getId(), LocalDateTime.now(), Status.APPROVED)
+            ));
         }
         return ItemListDto.builder().items(personalItems).build();
     }
