@@ -8,5 +8,5 @@ import java.util.List;
 @Builder
 public class ItemListDto {
     @JsonValue
-    private List<ItemDto> items;
+    private List<ItemDtoResponse> items;
 }

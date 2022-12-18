@@ -1,17 +1,18 @@
 package ru.practicum.shareit.item;
 
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemListDto;
+import ru.practicum.shareit.item.dto.*;
 
 
 public interface ItemService {
-    ItemDto createItem(ItemDto item, Long userId);
+    ItemDtoResponse createItem(ItemDto item, Long userId);
 
-    ItemDto updateItem(Long itemId, Long userId, ItemDto item);
+    ItemDtoResponse updateItem(Long itemId, Long userId, ItemDtoUpdate item);
 
-    ItemDto getItemByItemId(Long itemId);
+    ItemDtoResponse getItemByItemId(Long userId, Long itemId);
 
     ItemListDto getPersonalItems(Long userId);
 
     ItemListDto getFoundItems(String text);
+
+    CommentDtoResponse addComment(Long itemId, Long userId, CommentDto commentDto);
 }
