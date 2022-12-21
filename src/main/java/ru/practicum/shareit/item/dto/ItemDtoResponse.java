@@ -4,7 +4,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
-import ru.practicum.shareit.request.ItemRequest;
 
 import java.util.Set;
 
@@ -16,8 +15,7 @@ public class ItemDtoResponse {
     private String name;
     private String description;
     private Boolean available;
-    //private User owner;
-    private ItemRequest request;
+    private Long requestId;
     private BookingShortDto lastBooking;
     private BookingShortDto nextBooking;
     private Set<CommentDtoResponse> comments;

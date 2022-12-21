@@ -2,12 +2,15 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
 /**
@@ -15,6 +18,7 @@ import javax.validation.constraints.Min;
  */
 @RestController
 @RequestMapping("/items")
+@Validated
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ItemController {
     private final ItemService itemService;
@@ -41,15 +45,21 @@ public class ItemController {
     }
 
     @GetMapping
-    public ResponseEntity<ItemListDto> getPersonalItems(@RequestHeader("X-Sharer-User-Id") @Min(1) Long userId) {
+    public ResponseEntity<ItemListDto> getPersonalItems(
+            @RequestHeader("X-Sharer-User-Id") @Min(1) Long userId,
+            @RequestParam(value = "from", defaultValue = "0") @Min(0) Integer from,
+            @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(20) Integer size) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(itemService.getPersonalItems(userId));
+                .body(itemService.getPersonalItems(PageRequest.of(from / size, size), userId));
     }
 
     @GetMapping("search")
-    public ResponseEntity<ItemListDto> getFoundItems(@RequestParam String text) {
+    public ResponseEntity<ItemListDto> getFoundItems(
+            @RequestParam String text,
+            @RequestParam(value = "from", defaultValue = "0") @Min(0) Integer from,
+            @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(20) Integer size) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(itemService.getFoundItems(text));
+                .body(itemService.getFoundItems(PageRequest.of(from / size, size), text));
     }
 
     @PostMapping("{itemId}/comment")

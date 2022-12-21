@@ -11,6 +11,8 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.error.handler.exception.StateException;
 import ru.practicum.shareit.error.handler.responce.StateErrorResponse;
 
+import javax.validation.ConstraintViolationException;
+
 
 @RestControllerAdvice("ru.practicum.shareit")
 public class ErrorHandler {
@@ -48,5 +50,12 @@ public class ErrorHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new StateErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    private ResponseEntity<String> handleException(ConstraintViolationException e) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(HttpStatus.BAD_REQUEST + " " + e.getMessage());
     }
 }

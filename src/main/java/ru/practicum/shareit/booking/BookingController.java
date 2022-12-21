@@ -2,21 +2,25 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.booking.dto.BookingListDto;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
 /**
  * TODO Sprint add-bookings.
  */
 @RestController
-@RequestMapping(path = "/bookings")
+@RequestMapping("/bookings")
+@Validated
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class BookingController {
 
@@ -44,14 +48,22 @@ public class BookingController {
     }
 
     @GetMapping
-    public ResponseEntity<BookingListDto> getAllBookingsForUser(@RequestHeader("X-Sharer-User-Id") @Min(1) Long userId,
-                                                                @RequestParam(defaultValue = "ALL") String state) {
-        return ResponseEntity.status(HttpStatus.OK).body(bookingService.getAllBookingsForUser(userId, state));
+    public ResponseEntity<BookingListDto> getAllBookingsForUser(
+            @RequestHeader("X-Sharer-User-Id") @Min(1) Long userId,
+            @RequestParam(defaultValue = "ALL") String state,
+            @RequestParam(value = "from", defaultValue = "0") @Min(0) Integer from,
+            @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(20) Integer size) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(bookingService.getAllBookingsForUser(PageRequest.of(from / size, size), userId, state));
     }
 
     @GetMapping("owner")
     public ResponseEntity<BookingListDto> getAllBookingsForItemsUser(
-            @RequestHeader("X-Sharer-User-Id") @Min(1) Long userId, @RequestParam(defaultValue = "ALL") String state) {
-        return ResponseEntity.status(HttpStatus.OK).body(bookingService.getAllBookingsForItemsUser(userId, state));
+            @RequestHeader("X-Sharer-User-Id") @Min(1) Long userId,
+            @RequestParam(defaultValue = "ALL") String state,
+            @RequestParam(value = "from", defaultValue = "0") @Min(0) Integer from,
+            @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(20) Integer size) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(bookingService.getAllBookingsForItemsUser(PageRequest.of(from / size, size), userId, state));
     }
 }

@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -43,9 +44,9 @@ public class BookingServiceImpl implements BookingService {
                 User user = users.findById(bookerId).orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                                 "Пользователя с id=" + bookerId + " нет"));
-               Booking booking = mapper.mapToBookingFromBookingDto(bookingDto);
-               booking.setItem(item);
-               booking.setBooker(user);
+                Booking booking = mapper.mapToBookingFromBookingDto(bookingDto);
+                booking.setItem(item);
+                booking.setBooker(user);
                 return mapper.mapToBookingDtoResponse(bookings.save(booking));
             } else {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Вещь с id=" + item.getId()
@@ -96,17 +97,17 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public BookingListDto getAllBookingsForUser(Long userId, String state) {
+    public BookingListDto getAllBookingsForUser(Pageable pageable, Long userId, String state) {
         if (!users.existsById(userId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователя с id=" + userId + " не существует");
         } else {
-            return getListBookings(state, userId, false);
+            return getListBookings(pageable, state, userId, false);
         }
     }
 
     @Override
     @Transactional(readOnly = true)
-    public BookingListDto getAllBookingsForItemsUser(Long userId, String state) {
+    public BookingListDto getAllBookingsForItemsUser(Pageable pageable, Long userId, String state) {
         if (!users.existsById(userId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователя с id=" + userId + " не существует");
         }
@@ -114,23 +115,23 @@ public class BookingServiceImpl implements BookingService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "У пользователя с id=" + userId + " нет зарегестрированых вещей");
         } else {
-            return getListBookings(state, userId, true);
+            return getListBookings(pageable, state, userId, true);
         }
 
     }
 
-    private BookingListDto getListBookings(String state, Long userId, Boolean isOwner) {
+    private BookingListDto getListBookings(Pageable pageable, String state, Long userId, Boolean isOwner) {
         List<Long> itemsId;
         switch (State.fromValue(state.toUpperCase())) {
             case ALL:
                 if (isOwner) {
                     itemsId = items.findAllItemIdByOwnerId(userId);
                     return BookingListDto.builder()
-                            .bookings(bookings.findAllByItemIdInOrderByStartDesc(itemsId).stream()
+                            .bookings(bookings.findAllByItemIdInOrderByStartDesc(pageable, itemsId).stream()
                                     .map(mapper::mapToBookingDtoResponse).collect(Collectors.toList())).build();
                 } else {
                     return BookingListDto.builder()
-                            .bookings(bookings.findAllByBookerIdOrderByStartDesc(userId).stream()
+                            .bookings(bookings.findAllByBookerIdOrderByStartDesc(pageable, userId).stream()
                                     .map(mapper::mapToBookingDtoResponse).collect(Collectors.toList())).build();
                 }
             case CURRENT:
@@ -138,12 +139,12 @@ public class BookingServiceImpl implements BookingService {
                     itemsId = items.findAllItemIdByOwnerId(userId);
                     return BookingListDto.builder().bookings(
                             bookings.findAllByItemIdInAndStartIsBeforeAndEndIsAfterOrderByStartDesc(
-                                            itemsId, LocalDateTime.now(),LocalDateTime.now()).stream()
+                                            pageable, itemsId, LocalDateTime.now(), LocalDateTime.now()).stream()
                                     .map(mapper::mapToBookingDtoResponse).collect(Collectors.toList())).build();
                 } else {
                     return BookingListDto.builder().bookings(
                             bookings.findAllByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(
-                                            userId, LocalDateTime.now(),LocalDateTime.now()).stream()
+                                            pageable, userId, LocalDateTime.now(), LocalDateTime.now()).stream()
                                     .map(mapper::mapToBookingDtoResponse).collect(Collectors.toList())).build();
                 }
             case PAST:
@@ -151,14 +152,16 @@ public class BookingServiceImpl implements BookingService {
                     itemsId = items.findAllItemIdByOwnerId(userId);
                     return BookingListDto.builder()
                             .bookings(bookings
-                                    .findAllByItemIdInAndEndIsBeforeOrderByStartDesc(itemsId, LocalDateTime.now())
-                                    .stream().map(mapper::mapToBookingDtoResponse).collect(Collectors.toList()))
+                                    .findAllByItemIdInAndEndIsBeforeOrderByStartDesc(
+                                            pageable, itemsId, LocalDateTime.now()
+                                    ).stream().map(mapper::mapToBookingDtoResponse).collect(Collectors.toList()))
                             .build();
                 } else {
                     return BookingListDto.builder()
                             .bookings(bookings
-                                    .findAllByBookerIdAndEndIsBeforeOrderByStartDesc(userId, LocalDateTime.now())
-                                    .stream().map(mapper::mapToBookingDtoResponse).collect(Collectors.toList()))
+                                    .findAllByBookerIdAndEndIsBeforeOrderByStartDesc(
+                                            pageable, userId, LocalDateTime.now()
+                                    ).stream().map(mapper::mapToBookingDtoResponse).collect(Collectors.toList()))
                             .build();
                 }
             case FUTURE:
@@ -166,13 +169,13 @@ public class BookingServiceImpl implements BookingService {
                     itemsId = items.findAllItemIdByOwnerId(userId);
                     return BookingListDto.builder()
                             .bookings(bookings
-                                    .findAllByItemIdInAndStartIsAfterOrderByStartDesc(itemsId, LocalDateTime.now())
+                                    .findAllByItemIdInAndStartIsAfterOrderByStartDesc(pageable, itemsId, LocalDateTime.now())
                                     .stream().map(mapper::mapToBookingDtoResponse).collect(Collectors.toList()))
                             .build();
                 } else {
                     return BookingListDto.builder()
                             .bookings(bookings
-                                    .findAllByBookerIdAndStartIsAfterOrderByStartDesc(userId, LocalDateTime.now())
+                                    .findAllByBookerIdAndStartIsAfterOrderByStartDesc(pageable, userId, LocalDateTime.now())
                                     .stream().map(mapper::mapToBookingDtoResponse).collect(Collectors.toList()))
                             .build();
                 }
@@ -181,13 +184,13 @@ public class BookingServiceImpl implements BookingService {
                     itemsId = items.findAllItemIdByOwnerId(userId);
                     return BookingListDto.builder()
                             .bookings(bookings
-                                    .findAllByItemIdInAndStatusIsOrderByStartDesc(itemsId, Status.WAITING)
+                                    .findAllByItemIdInAndStatusIsOrderByStartDesc(pageable, itemsId, Status.WAITING)
                                     .stream().map(mapper::mapToBookingDtoResponse).collect(Collectors.toList()))
                             .build();
                 } else {
                     return BookingListDto.builder()
                             .bookings(bookings
-                                    .findAllByBookerIdAndStatusIsOrderByStartDesc(userId, Status.WAITING)
+                                    .findAllByBookerIdAndStatusIsOrderByStartDesc(pageable, userId, Status.WAITING)
                                     .stream().map(mapper::mapToBookingDtoResponse).collect(Collectors.toList()))
                             .build();
                 }
@@ -196,17 +199,18 @@ public class BookingServiceImpl implements BookingService {
                     itemsId = items.findAllItemIdByOwnerId(userId);
                     return BookingListDto.builder()
                             .bookings(bookings
-                                    .findAllByItemIdInAndStatusIsOrderByStartDesc(itemsId, Status.REJECTED)
+                                    .findAllByItemIdInAndStatusIsOrderByStartDesc(pageable, itemsId, Status.REJECTED)
                                     .stream().map(mapper::mapToBookingDtoResponse).collect(Collectors.toList()))
                             .build();
                 } else {
                     return BookingListDto.builder()
                             .bookings(bookings
-                                    .findAllByBookerIdAndStatusIsOrderByStartDesc(userId, Status.REJECTED)
+                                    .findAllByBookerIdAndStatusIsOrderByStartDesc(pageable, userId, Status.REJECTED)
                                     .stream().map(mapper::mapToBookingDtoResponse).collect(Collectors.toList()))
                             .build();
                 }
-            default: throw new StateException("Unknown state: " + state);
+            default:
+                throw new StateException("Unknown state: " + state);
         }
     }
 }
