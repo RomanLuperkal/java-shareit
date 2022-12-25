@@ -2,9 +2,7 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,6 +30,7 @@ import static org.assertj.core.api.Assertions.*;
 @AutoConfigureTestDatabase
 @ActiveProfiles("test")
 @Sql(scripts = {"file:src/main/resources/schema.sql"})
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 @Transactional
 public class BookingServiceTest extends Bookings {
@@ -58,6 +57,11 @@ public class BookingServiceTest extends Bookings {
         item1.setDescription("test item description");
         item1.setAvailable(Boolean.TRUE);
         item1.setOwner(user1);
+        item2 = new Item();
+        item2.setName("test item2");
+        item2.setDescription("test item2 description");
+        item2.setAvailable(Boolean.TRUE);
+        item2.setOwner(user2);
         booking1Dto = BookingDto.builder()
                 .start(LocalDateTime.now().plusDays(1))
                 .end(LocalDateTime.now().plusDays(2))
@@ -71,6 +75,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(1)
     public void createAndGetBooking() {
         //given
         em.persist(user1);
@@ -85,6 +90,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(2)
     public void createBookingWhenEndBeforeStart() {
         //given
         booking1Dto.setEnd(LocalDateTime.now().plusDays(1));
@@ -100,6 +106,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(8)
     public void createBookingWithNotExistingItem() {
         //given
         booking1Dto.setItemId(2L);
@@ -114,6 +121,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(9)
     public void createBookingWhenBookerIsOwner() {
         //given
         em.persist(user1);
@@ -127,6 +135,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(10)
     public void createBookingWhenNotExistingBooker() {
         em.persist(user1);
         em.persist(user2);
@@ -139,6 +148,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(11)
     public void createBookingWithNotAvailableItem() {
         //given
         item1.setAvailable(Boolean.FALSE);
@@ -153,6 +163,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(13)
     public void approveBooking() {
         //given
         em.persist(user1);
@@ -169,6 +180,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(14)
     public void rejectBooking() {
         //given
         em.persist(user1);
@@ -185,6 +197,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(15)
     public void approveBookingWithIncorrectParamApproved() {
         //given
         em.persist(user1);
@@ -199,6 +212,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(16)
     public void approveBookingWithNotExistingBooking() {
         //given
         em.persist(user1);
@@ -213,6 +227,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(17)
     public void approveBookingWhenBookingIsNotWaiting() {
         //given
         em.persist(user1);
@@ -228,6 +243,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(18)
     public void approveBookingWhenUserIsNotOwner() {
         //given
         em.persist(user1);
@@ -242,6 +258,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(19)
     public void getBookingWhenBookingNotFound() {
         //given
         em.persist(user1);
@@ -256,6 +273,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(20)
     public void getBookingWhenUserIsNotOwnerOrBooker() {
         //given
         em.persist(user1);
@@ -270,6 +288,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(27)
     public void getAllBookingForUserWhenStateIsAll() {
         //given
         initializationItem2AndBookings();
@@ -298,6 +317,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(28)
     public void getAllBookingsForItemsUser() {
         //given
         initializationItem2AndBookings();
@@ -321,6 +341,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(7)
     public void getAllBookingsForUserWhenStateIsCurrent() {
         //given
         initializationItem2AndBookings();
@@ -340,6 +361,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(21)
     public void getAllBookingsForItemsUserWhenStateIsCurrent() {
         //given
         initializationItem2AndBookings();
@@ -357,6 +379,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(3)
     public void getAllBookingsForUserWhenStateIsPast() {
         //given
         initializationItem2AndBookings();
@@ -376,6 +399,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(22)
     public void getAllBookingsForItemsUserWhenStateIsPast() {
         //given
         initializationItem2AndBookings();
@@ -393,6 +417,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(4)
     public void getAllBookingsForUserWhenStateIsFuture() {
         //given
         initializationItem2AndBookings();
@@ -416,6 +441,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(12)
     public void getAllBookingsForItemsUserWhenStateIsFuture() {
         //given
         initializationItem2AndBookings();
@@ -436,6 +462,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(6)
     public void getAllBookingsForUserWhenStateIsWaiting() {
         //given
         initializationItem2AndBookings();
@@ -455,6 +482,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(23)
     public void getAllBookingsForItemsUserWhenStateIsWaiting() {
         //given
         initializationItem2AndBookings();
@@ -472,6 +500,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(5)
     public void getAllBookingsForUserWhenStateIsRejected() {
         //given
         initializationItem2AndBookings();
@@ -491,6 +520,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(24)
     public void getAllBookingsForItemsUserWhenStateIsRejected() {
         //given
         initializationItem2AndBookings();
@@ -508,6 +538,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(25)
     public void getBookingListWithUnknownState() {
         em.persist(user1);
         assertThatThrownBy(
@@ -516,6 +547,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(26)
     public void getAllBookingsForUserWhenUserNotFound() {
         em.persist(user1);
         assertThatThrownBy(
@@ -524,6 +556,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(29)
     public void getAllBookingsForItemsUserWhenUserNotFound() {
         //given
         initializationItem2AndBookings();
@@ -538,6 +571,7 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
+    @Order(30)
     public void getAllBookingsForItemsUserWhenUserNotExistingBooking() {
         //given
         em.persist(user1);
@@ -548,11 +582,6 @@ public class BookingServiceTest extends Bookings {
 
 
     private void initializationItem2AndBookings() {
-        item2 = new Item();
-        item2.setName("test item2");
-        item2.setDescription("test item2 description");
-        item2.setAvailable(Boolean.TRUE);
-        item2.setOwner(user2);
 
         currentBookingForItem1 = new Booking();
         currentBookingForItem1.setStart(LocalDateTime.now().minusDays(1));
