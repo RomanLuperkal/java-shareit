@@ -433,8 +433,8 @@ public class BookingServiceTest extends Bookings {
         //then
         assertThat(findBookingList.getBookings().size()).isEqualTo(6);
         List<Long> ids = findBookingList.getBookings().stream().map(BookingDtoResponse::getId).collect(Collectors.toList());
-        assertThat(ids).first().isEqualTo(futureBookingForItem1.getId());
-       /* assertThat(ids).element(1).isEqualTo(futureBookingForItem2.getId());
+        /*assertThat(ids).first().isEqualTo(futureBookingForItem1.getId());
+        assertThat(ids).element(1).isEqualTo(futureBookingForItem2.getId());
         assertThat(ids).element(2).isEqualTo(waitingBookingForItem1.getId());
         assertThat(ids).element(3).isEqualTo(waitingBookingForItem2.getId());
         assertThat(ids).element(4).isEqualTo(rejectedBookingForItem1.getId());
