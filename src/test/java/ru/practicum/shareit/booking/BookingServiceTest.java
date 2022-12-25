@@ -35,6 +35,7 @@ import static org.assertj.core.api.Assertions.*;
 @Transactional
 public class BookingServiceTest extends Bookings {
     private final BookingService bookingService;
+    private final BookingRepository bookingRepository;
     private final EntityManager em;
     private User user1;
     private User user2;
@@ -620,16 +621,15 @@ public class BookingServiceTest extends Bookings {
 
     @SneakyThrows
     private void addBookingsInDb() {
-        Thread.sleep(100);
-        em.persist(currentBookingForItem1);
-        em.persist(currentBookingForItem2);
-        em.persist(pastBookingForItem1);
-        em.persist(pastBookingForItem2);
-        em.persist(futureBookingForItem1);
-        em.persist(futureBookingForItem2);
-        em.persist(waitingBookingForItem1);
-        em.persist(waitingBookingForItem2);
-        em.persist(rejectedBookingForItem1);
-        em.persist(rejectedBookingForItem2);
+        bookingRepository.save(currentBookingForItem1);
+        bookingRepository.save(currentBookingForItem2);
+        bookingRepository.save(pastBookingForItem1);
+        bookingRepository.save(pastBookingForItem2);
+        bookingRepository.save(futureBookingForItem1);
+        bookingRepository.save(futureBookingForItem2);
+        bookingRepository.save(waitingBookingForItem1);
+        bookingRepository.save(waitingBookingForItem2);
+        bookingRepository.save(rejectedBookingForItem1);
+        bookingRepository.save(rejectedBookingForItem2);
     }
 }
