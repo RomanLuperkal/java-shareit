@@ -33,14 +33,14 @@ public class ItemController {
     @PatchMapping("{itemId}")
     public ResponseEntity<ItemDtoResponse> updateItem(@RequestHeader("X-Sharer-User-Id") @Min(1) Long userId,
                                                       @RequestBody ItemDtoUpdate itemDtoUpdate,
-                                                      @PathVariable Long itemId) {
+                                                      @PathVariable @Min(1) Long itemId) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(itemService.updateItem(itemId, userId, itemDtoUpdate));
     }
 
     @GetMapping("{itemId}")
     public ResponseEntity<ItemDtoResponse> getItemByItemId(@RequestHeader("X-Sharer-User-Id") @Min(1) Long userId,
-                                                           @PathVariable Long itemId) {
+                                                           @PathVariable @Min(1) Long itemId) {
         return ResponseEntity.status(HttpStatus.OK).body(itemService.getItemByItemId(userId, itemId));
     }
 

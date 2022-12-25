@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.request.dto.*;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
@@ -35,7 +36,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователя с id=" + requesterId + " нет");
         }
         return ItemRequestListDto.builder()
-                .requests(mapper.mapToRequestDtoResponseWithMD(requests.findAllById(pageRequest, requesterId)
+                .requests(mapper.mapToRequestDtoResponseWithMD(requests.findAllByRequesterId(pageRequest, requesterId)
                 )).build();
     }
 
@@ -45,7 +46,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователя с id=" + requesterId + " нет");
         }
         return ItemRequestListDto.builder()
-                .requests(mapper.mapToRequestDtoResponseWithMD(requests.findAllByIdNot(pageRequest, requesterId)
+                .requests(mapper.mapToRequestDtoResponseWithMD(requests.findAllByRequesterIdNot(pageRequest, requesterId)
                 )).build();
     }
 

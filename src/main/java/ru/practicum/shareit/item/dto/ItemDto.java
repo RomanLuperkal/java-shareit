@@ -3,9 +3,7 @@ package ru.practicum.shareit.item.dto;
 import lombok.Builder;
 import lombok.Data;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 
 /**
  * TODO Sprint add-controllers.
@@ -13,9 +11,13 @@ import javax.validation.constraints.NotNull;
 @Data
 @Builder
 public class ItemDto {
-    @NotBlank(message = "Имя не должно быть пустым")
+    @Pattern(regexp = "^[^ ].*[^ ]$", message = "Неккоректное имя")
+    @Size(max = 255)
+    @NotNull(message = "Поле name обязательно")
     private String name;
-    @NotBlank(message = "Описание не должно быть пустым")
+    @Pattern(regexp = "^[^ ].*[^ ]$", message = "Неккоректное описание")
+    @Size(max = 500)
+    @NotNull(message = "Поле description обязательно")
     private String description;
     @NotNull(message = "Поле available обязательно")
     private Boolean available;

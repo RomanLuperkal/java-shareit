@@ -7,6 +7,7 @@ import ru.practicum.shareit.request.dto.ItemDataForRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestDtoResponse;
 import ru.practicum.shareit.request.dto.RequestDtoResponseWithMD;
+import ru.practicum.shareit.request.model.ItemRequest;
 
 import java.util.List;
 
