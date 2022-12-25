@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,11 @@ public class BookingServiceTest extends Bookings {
                 .end(LocalDateTime.now().plusDays(2))
                 .itemId(1L)
                 .build();
+    }
+
+    @AfterEach
+    public void deleteBookings() {
+        bookingRepository.deleteAll();
     }
 
     @Test
@@ -621,6 +627,7 @@ public class BookingServiceTest extends Bookings {
 
     @SneakyThrows
     private void addBookingsInDb() {
+        Thread.sleep(300);
         bookingRepository.save(currentBookingForItem1);
         bookingRepository.save(currentBookingForItem2);
         bookingRepository.save(pastBookingForItem1);
