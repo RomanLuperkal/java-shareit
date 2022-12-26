@@ -30,7 +30,7 @@ public class ItemRequest {
     private User requester;
     @Column
     private LocalDateTime created;
-    @OneToMany(mappedBy = "request")
+    @OneToMany(mappedBy = "request", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Item> items;
 
     @Override

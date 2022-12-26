@@ -9,17 +9,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.dto.*;
-import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.ItemRequestRepository;
 import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
-
-import javax.persistence.EntityManager;
 
 import java.time.LocalDateTime;
 
@@ -31,10 +30,12 @@ import static org.assertj.core.api.Assertions.*;
 @ActiveProfiles("test")
 @Sql(scripts = {"file:src/main/resources/schema.sql"})
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-@Transactional
 public class ItemServiceTest {
     private final ItemService itemService;
-    private final EntityManager em;
+    private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
+    private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
     private ItemDto item1Dto;
     private ItemDto item2Dto;
     private ItemDtoUpdate item1UpdateDto;
@@ -74,16 +75,15 @@ public class ItemServiceTest {
         itemRequest1.setCreated(LocalDateTime.now());
     }
 
-
     @Test
     public void createAndGetItemById() {
         //given
-        em.persist(user1);
+        userRepository.save(user1);
         //when
         var savedItem = itemService.createItem(item1Dto, user1.getId());
         var findItem = itemService.getItemByItemId(user1.getId(), savedItem.getId());
         //then
-        assertThat(savedItem).usingRecursiveComparison().isEqualTo(findItem);
+        assertThat(savedItem).usingRecursiveComparison().ignoringFields("comments").isEqualTo(findItem);
     }
 
     @Test
@@ -99,17 +99,17 @@ public class ItemServiceTest {
     @Test
     public void createItemWithItemRequest() {
         //given
-        em.persist(user1);
-        em.persist(user2);
-        em.persist(itemRequest1);
+        userRepository.save(user1);
+        userRepository.save(user2);
+        itemRequestRepository.save(itemRequest1);
         item1Dto.setRequestId(itemRequest1.getId());
 
         //when
         var savedItem = itemService.createItem(item1Dto, user1.getId());
         var findItem = itemService.getItemByItemId(user2.getId(), savedItem.getId());
-        var saveRequest = em.find(ItemRequest.class, itemRequest1.getId());
+        var saveRequest = itemRequestRepository.findById(itemRequest1.getId()).get();
         //then
-        assertThat(savedItem).usingRecursiveComparison().isEqualTo(findItem);
+        assertThat(savedItem).usingRecursiveComparison().ignoringFields("comments").isEqualTo(findItem);
         assertThat(saveRequest.equals(itemRequest1)).isTrue();
         assertThat(user1.equals(user2)).isFalse();
     }
@@ -117,9 +117,9 @@ public class ItemServiceTest {
     @Test
     public void createItemWithNotExistingItemRequest() {
         //given
-        em.persist(user1);
-        em.persist(user2);
-        em.persist(itemRequest1);
+        userRepository.save(user1);
+        userRepository.save(user2);
+        itemRequestRepository.save(itemRequest1);
         item1Dto.setRequestId(2L);
         assertThatThrownBy(
                 //when
@@ -132,7 +132,7 @@ public class ItemServiceTest {
     @Test
     public void updateItem() {
         //given
-        em.persist(user1);
+        userRepository.save(user1);
         //when
         var savedItem = itemService.createItem(item1Dto, user1.getId());
         var updatedItem = itemService.updateItem(savedItem.getId(), user1.getId(), item1UpdateDto);
@@ -146,7 +146,7 @@ public class ItemServiceTest {
     @Test
     public void updateItemWithNotExistingItemId() {
         //given
-        em.persist(user1);
+        userRepository.save(user1);
         itemService.createItem(item1Dto, user1.getId());
         assertThatThrownBy(
                 () -> itemService.updateItem(2L, user1.getId(), item1UpdateDto)
@@ -158,7 +158,7 @@ public class ItemServiceTest {
     @Test
     public void updateItemWithOtherUser() {
         //given
-        em.persist(user1);
+        userRepository.save(user1);
         //when
         var savedItem = itemService.createItem(item1Dto, user1.getId());
         assertThatThrownBy(
@@ -171,7 +171,7 @@ public class ItemServiceTest {
     @Test
     public void getItemByNotExistingId() {
         //given
-        em.persist(user1);
+        userRepository.save(user1);
         //when
         itemService.createItem(item1Dto, user1.getId());
         assertThatThrownBy(
@@ -183,12 +183,12 @@ public class ItemServiceTest {
     @Test
     void getItemByIdWithLastAndNextBookings() {
         //given
-        em.persist(user1);
-        em.persist(user2);
+        userRepository.save(user1);
+        userRepository.save(user2);
         var savedItem = itemService.createItem(item1Dto, user1.getId());
         createLastAndNextBookings(savedItem);
-        em.persist(lastBooking);
-        em.persist(nextBooking);
+        bookingRepository.save(lastBooking);
+        bookingRepository.save(nextBooking);
         //when
         var findItem = itemService.getItemByItemId(user1.getId(), savedItem.getId());
         //then
@@ -205,13 +205,13 @@ public class ItemServiceTest {
     @Test
     public void getPersonalItems() {
         //given
-        em.persist(user1);
-        em.persist(user2);
+        userRepository.save(user1);
+        userRepository.save(user2);
         var savedItem1 = itemService.createItem(item1Dto, user1.getId());
         itemService.createItem(item2Dto, user2.getId());
         createLastAndNextBookings(savedItem1);
-        em.persist(lastBooking);
-        em.persist(nextBooking);
+        bookingRepository.save(lastBooking);
+        bookingRepository.save(nextBooking);
         var findItem = itemService.getItemByItemId(savedItem1.getId(), user1.getId());
         //when
         var personalItemsList = itemService.getPersonalItems(PageRequest.of(0, 2), user1.getId());
@@ -223,13 +223,13 @@ public class ItemServiceTest {
     @Test
     public void getPersonalItemsWithNotExistingUser() {
         //given
-        em.persist(user1);
-        em.persist(user2);
+        userRepository.save(user1);
+        userRepository.save(user2);
         var savedItem1 = itemService.createItem(item1Dto, user1.getId());
         itemService.createItem(item2Dto, user2.getId());
         createLastAndNextBookings(savedItem1);
-        em.persist(lastBooking);
-        em.persist(nextBooking);
+        bookingRepository.save(lastBooking);
+        bookingRepository.save(nextBooking);
         assertThatThrownBy(
                 //when
                 () -> itemService.getPersonalItems(PageRequest.of(0, 2), 99L)
@@ -240,25 +240,28 @@ public class ItemServiceTest {
     @Test
     public void getFoundItems() {
         //given
-        em.persist(user1);
+        userRepository.save(user1);
         var savedItem1 = itemService.createItem(item1Dto, user1.getId());
         var savedItem2 = itemService.createItem(item2Dto, user1.getId());
         //when
         var findItems = itemService.getFoundItems(PageRequest.of(0, 2), "em2");
         //then
-        assertThat(findItems.getItems()).singleElement().usingRecursiveComparison().isEqualTo(savedItem2);
+        assertThat(findItems.getItems()).singleElement().usingRecursiveComparison()
+                .ignoringFields("comments").isEqualTo(savedItem2);
         //when
         findItems = itemService.getFoundItems(PageRequest.of(0, 2), "test");
         //then
         assertThat(findItems.getItems().size()).isEqualTo(2);
-        assertThat(findItems.getItems()).element(0).usingRecursiveComparison().isEqualTo(savedItem1);
-        assertThat(findItems.getItems()).element(1).usingRecursiveComparison().isEqualTo(savedItem2);
+        assertThat(findItems.getItems()).element(0).usingRecursiveComparison()
+                .ignoringFields("comments").isEqualTo(savedItem1);
+        assertThat(findItems.getItems()).element(1).usingRecursiveComparison()
+                .ignoringFields("comments").isEqualTo(savedItem2);
     }
 
     @Test
     public void getFoundItemsWhenSearchTextIsBlank() {
         //given
-        em.persist(user1);
+        userRepository.save(user1);
         itemService.createItem(item1Dto, user1.getId());
         itemService.createItem(item2Dto, user1.getId());
         //when
@@ -273,14 +276,14 @@ public class ItemServiceTest {
         CommentDto commentDto = CommentDto.builder()
                 .text("Nice item, awesome author")
                 .build();
-        em.persist(user1);
-        em.persist(user2);
+        userRepository.save(user1);
+        userRepository.save(user2);
         var savedItem1 = itemService.createItem(item1Dto, user1.getId());
         createLastAndNextBookings(savedItem1);
-        em.persist(lastBooking);
+        bookingRepository.save(lastBooking);
         //when
         var savedComment1 = itemService.addComment(savedItem1.getId(), user2.getId(), commentDto);
-        var comment1 = em.find(Comment.class, savedComment1.getId());
+        var comment1 = commentRepository.findById(savedComment1.getId()).get();
         //then
         assertThat(savedComment1.getId()).isEqualTo(1L);
         assertThat(savedComment1.getText()).isEqualTo(commentDto.getText());
@@ -289,7 +292,7 @@ public class ItemServiceTest {
         //when
         commentDto.setText("Nice item, awesome author2");
         var savedComment2 = itemService.addComment(savedItem1.getId(), user2.getId(), commentDto);
-        var comment2 = em.find(Comment.class, savedComment2.getId());
+        var comment2 = commentRepository.findById(savedComment2.getId()).get();
         //then
         assertThat(comment1.equals(comment2)).isFalse();
 
@@ -301,8 +304,8 @@ public class ItemServiceTest {
         CommentDto commentDto = CommentDto.builder()
                 .text("Nice item, awesome author")
                 .build();
-        em.persist(user1);
-        em.persist(user2);
+        userRepository.save(user1);
+        userRepository.save(user2);
         var savedItem1 = itemService.createItem(item1Dto, user1.getId());
         assertThatThrownBy(
                 //when
@@ -317,11 +320,11 @@ public class ItemServiceTest {
         CommentDto commentDto = CommentDto.builder()
                 .text("Nice item, awesome author")
                 .build();
-        em.persist(user1);
-        em.persist(user2);
+        userRepository.save(user1);
+        userRepository.save(user2);
         var savedItem1 = itemService.createItem(item1Dto, user1.getId());
         createLastAndNextBookings(savedItem1);
-        em.persist(lastBooking);
+        bookingRepository.save(lastBooking);
         assertThat(lastBooking.equals(nextBooking)).isFalse();
         assertThatThrownBy(
                 //when
@@ -336,11 +339,11 @@ public class ItemServiceTest {
         CommentDto commentDto = CommentDto.builder()
                 .text("Nice item, awesome author")
                 .build();
-        em.persist(user1);
-        em.persist(user2);
+        userRepository.save(user1);
+        userRepository.save(user2);
         var savedItem1 = itemService.createItem(item1Dto, user1.getId());
         createLastAndNextBookings(savedItem1);
-        em.persist(lastBooking);
+        bookingRepository.save(lastBooking);
         assertThatThrownBy(
                 //when
                 () -> itemService.addComment(savedItem1.getId(), 50L, commentDto)

@@ -70,11 +70,11 @@ public class ItemServiceImpl implements ItemService {
             itemDtoResponse.setLastBooking(mapper
                     .mapToBookingShortDto(bookings
                             .findFirstByItemIdAndEndBeforeAndStatusOrderByEndDesc(
-                                    itemId, LocalDateTime.now(), Status.APPROVED)
+                                    itemId, LocalDateTime.now(), Status.APPROVED).orElse(null) //я переделал на optional но тут нужен конкретно null при отсутсвии букинга
                     ));
             itemDtoResponse.setNextBooking(mapper.mapToBookingShortDto(bookings
                     .findFirstByItemIdAndStartAfterAndStatusOrderByStartAsc(
-                            itemId, LocalDateTime.now(), Status.APPROVED)
+                            itemId, LocalDateTime.now(), Status.APPROVED).orElse(null)
             ));
             return itemDtoResponse;
         }
@@ -91,10 +91,10 @@ public class ItemServiceImpl implements ItemService {
                 .map(mapper::mapToItemDtoResponse).collect(Collectors.toList());
         for (ItemDtoResponse item : personalItems) {
             item.setLastBooking(mapper.mapToBookingShortDto(bookings.findFirstByItemIdAndEndBeforeAndStatusOrderByEndDesc(
-                    item.getId(), LocalDateTime.now(), Status.APPROVED)));
+                    item.getId(), LocalDateTime.now(), Status.APPROVED).orElse(null)));
             item.setNextBooking(mapper.mapToBookingShortDto(bookings
                     .findFirstByItemIdAndStartAfterAndStatusOrderByStartAsc(
-                            item.getId(), LocalDateTime.now(), Status.APPROVED)
+                            item.getId(), LocalDateTime.now(), Status.APPROVED).orElse(null)
             ));
         }
         return ItemListDto.builder().items(personalItems).build();

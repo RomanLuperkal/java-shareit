@@ -9,12 +9,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
-
-import javax.persistence.EntityManager;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -23,10 +21,9 @@ import static org.assertj.core.api.Assertions.*;
 @ActiveProfiles("test")
 @Sql(scripts = {"file:src/main/resources/schema.sql"})
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-@Transactional
 public class ItemRequestServiceTest {
     private final ItemRequestService itemRequestService;
-    private final EntityManager em;
+    private final UserRepository userRepository;
     private User user1;
     private User user2;
     private ItemRequestDto itemRequestDto;
@@ -47,19 +44,19 @@ public class ItemRequestServiceTest {
     @Test
     public void createItemRequest() {
         //given
-        em.persist(user1);
+        userRepository.save(user1);
         //when
         var savedRequest = itemRequestService.createItemRequest(itemRequestDto, user1.getId());
         var findRequest = itemRequestService.getItemRequest(user1.getId(), savedRequest.getId());
         //then
-        assertThat(savedRequest).usingRecursiveComparison().ignoringFields("items")
+        assertThat(savedRequest).usingRecursiveComparison().ignoringFields("items", "created")
                 .isEqualTo(findRequest);
     }
 
     @Test
     public void createItemRequestWhenRequesterNotFound() {
         //given
-        em.persist(user1);
+        userRepository.save(user1);
         assertThatThrownBy(
                 //when
                 () -> itemRequestService.createItemRequest(itemRequestDto, 99L)
@@ -70,8 +67,8 @@ public class ItemRequestServiceTest {
     @Test
     public void getPrivateRequest() {
         //given
-        em.persist(user1);
-        em.persist(user2);
+        userRepository.save(user1);
+        userRepository.save(user2);
         var savedRequest = itemRequestService.createItemRequest(itemRequestDto, user2.getId());
         //when
         var privateRequests = itemRequestService
@@ -84,7 +81,7 @@ public class ItemRequestServiceTest {
     @Test
     public void getPrivateRequestWhenRequesterNotExistingRequests() {
         //given
-        em.persist(user1);
+        userRepository.save(user1);
         assertThatThrownBy(
                 //when
                 () -> itemRequestService
@@ -96,8 +93,8 @@ public class ItemRequestServiceTest {
     @Test
     public void getOtherRequests() {
         //given
-        em.persist(user1);
-        em.persist(user2);
+        userRepository.save(user1);
+        userRepository.save(user2);
         var savedRequest = itemRequestService.createItemRequest(itemRequestDto, user1.getId());
         var findRequest = itemRequestService.getItemRequest(user1.getId(), savedRequest.getId());
         //when
@@ -109,7 +106,7 @@ public class ItemRequestServiceTest {
     @Test
     public void getOtherRequestsWhenRequesterNotFound() {
         //given
-        em.persist(user1);
+        userRepository.save(user1);
         itemRequestService.createItemRequest(itemRequestDto, user1.getId());
         assertThatThrownBy(
                 //when
@@ -121,7 +118,7 @@ public class ItemRequestServiceTest {
     @Test
     public void getItemRequestWhenUserNotFound() {
         //given
-        em.persist(user1);
+        userRepository.save(user1);
         var savedRequest = itemRequestService.createItemRequest(itemRequestDto, user1.getId());
         assertThatThrownBy(
                 //when
@@ -133,7 +130,7 @@ public class ItemRequestServiceTest {
     @Test
     public void getItemRequestWhenRequestNotFound() {
         //given
-        em.persist(user1);
+        userRepository.save(user1);
         var savedRequest = itemRequestService.createItemRequest(itemRequestDto, user1.getId());
         assertThatThrownBy(
                 //when
