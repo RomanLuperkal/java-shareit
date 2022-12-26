@@ -30,7 +30,6 @@ import static org.assertj.core.api.Assertions.*;
 @AutoConfigureTestDatabase
 @ActiveProfiles("test")
 @Sql(scripts = {"file:src/main/resources/schema.sql"})
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class BookingServiceTest extends Bookings {
     private final BookingService bookingService;
@@ -70,7 +69,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(1)
     public void createAndGetBooking() {
         //given
         userRepository.save(user1);
@@ -86,7 +84,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(2)
     public void createBookingWhenEndBeforeStart() {
         //given
         booking1Dto.setEnd(LocalDateTime.now().plusDays(1));
@@ -102,7 +99,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(8)
     public void createBookingWithNotExistingItem() {
         //given
         booking1Dto.setItemId(2L);
@@ -117,7 +113,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(9)
     public void createBookingWhenBookerIsOwner() {
         //given
         userRepository.save(user1);
@@ -131,7 +126,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(10)
     public void createBookingWhenNotExistingBooker() {
         userRepository.save(user1);
         userRepository.save(user2);
@@ -144,7 +138,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(11)
     public void createBookingWithNotAvailableItem() {
         //given
         item1.setAvailable(Boolean.FALSE);
@@ -159,7 +152,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(13)
     public void approveBooking() {
         //given
         userRepository.save(user1);
@@ -176,7 +168,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(14)
     public void rejectBooking() {
         //given
         userRepository.save(user1);
@@ -193,7 +184,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(15)
     public void approveBookingWithIncorrectParamApproved() {
         //given
         userRepository.save(user1);
@@ -208,7 +198,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(16)
     public void approveBookingWithNotExistingBooking() {
         //given
         userRepository.save(user1);
@@ -223,7 +212,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(17)
     public void approveBookingWhenBookingIsNotWaiting() {
         //given
         userRepository.save(user1);
@@ -239,7 +227,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(18)
     public void approveBookingWhenUserIsNotOwner() {
         //given
         userRepository.save(user1);
@@ -254,7 +241,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(19)
     public void getBookingWhenBookingNotFound() {
         //given
         userRepository.save(user1);
@@ -269,7 +255,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(20)
     public void getBookingWhenUserIsNotOwnerOrBooker() {
         //given
         userRepository.save(user1);
@@ -284,7 +269,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(27)
     public void getAllBookingForUserWhenStateIsAll() {
         //given
         initializationItem2AndBookings();
@@ -313,7 +297,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(28)
     public void getAllBookingsForItemsUser() {
         //given
         initializationItem2AndBookings();
@@ -337,7 +320,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(7)
     public void getAllBookingsForUserWhenStateIsCurrent() {
         //given
         initializationItem2AndBookings();
@@ -357,7 +339,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(21)
     public void getAllBookingsForItemsUserWhenStateIsCurrent() {
         //given
         initializationItem2AndBookings();
@@ -375,7 +356,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(3)
     public void getAllBookingsForUserWhenStateIsPast() {
         //given
         initializationItem2AndBookings();
@@ -395,7 +375,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(22)
     public void getAllBookingsForItemsUserWhenStateIsPast() {
         //given
         initializationItem2AndBookings();
@@ -413,7 +392,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(4)
     public void getAllBookingsForUserWhenStateIsFuture() {
         //given
         initializationItem2AndBookings();
@@ -437,7 +415,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(12)
     public void getAllBookingsForItemsUserWhenStateIsFuture() {
         //given
         initializationItem2AndBookings();
@@ -458,7 +435,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(6)
     public void getAllBookingsForUserWhenStateIsWaiting() {
         //given
         initializationItem2AndBookings();
@@ -478,7 +454,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(23)
     public void getAllBookingsForItemsUserWhenStateIsWaiting() {
         //given
         initializationItem2AndBookings();
@@ -496,7 +471,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(5)
     public void getAllBookingsForUserWhenStateIsRejected() {
         //given
         initializationItem2AndBookings();
@@ -516,7 +490,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(24)
     public void getAllBookingsForItemsUserWhenStateIsRejected() {
         //given
         initializationItem2AndBookings();
@@ -534,7 +507,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(25)
     public void getBookingListWithUnknownState() {
         userRepository.save(user1);
         assertThatThrownBy(
@@ -543,7 +515,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(26)
     public void getAllBookingsForUserWhenUserNotFound() {
         userRepository.save(user1);
         assertThatThrownBy(
@@ -552,7 +523,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(29)
     public void getAllBookingsForItemsUserWhenUserNotFound() {
         //given
         initializationItem2AndBookings();
@@ -567,7 +537,6 @@ public class BookingServiceTest extends Bookings {
     }
 
     @Test
-    @Order(30)
     public void getAllBookingsForItemsUserWhenUserNotExistingBooking() {
         //given
         userRepository.save(user1);
