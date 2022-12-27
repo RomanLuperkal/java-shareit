@@ -2,6 +2,7 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -10,6 +11,8 @@ import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.ItemRequestRepository;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
@@ -28,11 +31,18 @@ public class ItemServiceImpl implements ItemService {
     private final BookingRepository bookings;
     private final CommentRepository comments;
     private final ItemMapper mapper;
+    private final ItemRequestRepository itemRequests;
 
     @Override
     @Transactional
     public ItemDtoResponse createItem(ItemDto item, Long userId) throws ResponseStatusException {
         Item newItem = mapper.mapToItemFromItemDto(item);
+        if (item.getRequestId() != null) {
+            ItemRequest itemRequest = itemRequests.findById(item.getRequestId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Запроса с id=" +
+                            item.getRequestId() + " нет"));
+            newItem.setRequest(itemRequest);
+        }
         newItem.setOwner(users.findById(userId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователя с id=" + userId + " нет")));
         return mapper.mapToItemDtoResponse(items.save(newItem));
@@ -60,11 +70,11 @@ public class ItemServiceImpl implements ItemService {
             itemDtoResponse.setLastBooking(mapper
                     .mapToBookingShortDto(bookings
                             .findFirstByItemIdAndEndBeforeAndStatusOrderByEndDesc(
-                                    itemId, LocalDateTime.now(), Status.APPROVED)
+                                    itemId, LocalDateTime.now(), Status.APPROVED).orElse(null) //я переделал на optional но тут нужен конкретно null при отсутсвии букинга
                     ));
             itemDtoResponse.setNextBooking(mapper.mapToBookingShortDto(bookings
                     .findFirstByItemIdAndStartAfterAndStatusOrderByStartAsc(
-                            itemId, LocalDateTime.now(), Status.APPROVED)
+                            itemId, LocalDateTime.now(), Status.APPROVED).orElse(null)
             ));
             return itemDtoResponse;
         }
@@ -73,18 +83,18 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public ItemListDto getPersonalItems(Long userId) {
+    public ItemListDto getPersonalItems(Pageable pageable, Long userId) {
         if (!users.existsById(userId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователя с id=" + userId + " не существует");
         }
-        List<ItemDtoResponse> personalItems = items.findAllByOwnerId(userId).stream()
+        List<ItemDtoResponse> personalItems = items.findAllByOwnerId(pageable, userId).stream()
                 .map(mapper::mapToItemDtoResponse).collect(Collectors.toList());
         for (ItemDtoResponse item : personalItems) {
             item.setLastBooking(mapper.mapToBookingShortDto(bookings.findFirstByItemIdAndEndBeforeAndStatusOrderByEndDesc(
-                    item.getId(), LocalDateTime.now(), Status.APPROVED)));
+                    item.getId(), LocalDateTime.now(), Status.APPROVED).orElse(null)));
             item.setNextBooking(mapper.mapToBookingShortDto(bookings
                     .findFirstByItemIdAndStartAfterAndStatusOrderByStartAsc(
-                            item.getId(), LocalDateTime.now(), Status.APPROVED)
+                            item.getId(), LocalDateTime.now(), Status.APPROVED).orElse(null)
             ));
         }
         return ItemListDto.builder().items(personalItems).build();
@@ -92,12 +102,12 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public ItemListDto getFoundItems(String text) {
+    public ItemListDto getFoundItems(Pageable pageable, String text) {
         if (text.isBlank()) {
             return ItemListDto.builder().items(new ArrayList<>()).build();
         }
         return ItemListDto.builder()
-                .items(items.findAllByNameOrDescriptionContainingIgnoreCaseAndAvailableTrue(text, text).stream()
+                .items(items.findAllByNameOrDescriptionContainingIgnoreCaseAndAvailableTrue(pageable, text, text).stream()
                         .map(mapper::mapToItemDtoResponse).collect(Collectors.toList())).build();
     }
 

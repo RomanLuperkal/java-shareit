@@ -1,4 +1,4 @@
-package ru.practicum.shareit.user.dto;
+package ru.practicum.shareit.request.dto;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Builder;
@@ -8,7 +8,7 @@ import java.util.List;
 
 @Builder
 @Getter
-public class UserListDto {
+public class ItemRequestListDto {
     @JsonValue
-    private List<UserDtoResponse> users;
+    private List<RequestDtoResponseWithMD> requests;
 }

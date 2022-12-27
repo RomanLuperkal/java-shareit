@@ -6,10 +6,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.error.handler.exception.StateException;
 import ru.practicum.shareit.error.handler.responce.StateErrorResponse;
+
+import javax.validation.ConstraintViolationException;
 
 
 @RestControllerAdvice("ru.practicum.shareit")
@@ -29,13 +30,6 @@ public class ErrorHandler {
                 .body(HttpStatus.BAD_REQUEST + " " + e.getFieldError().getDefaultMessage());
     }
 
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    private ResponseEntity<String> handleException(MethodArgumentTypeMismatchException e) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(HttpStatus.BAD_REQUEST + " Некорректные параметры строки " + e.getName() + "=" + e.getValue());
-    }
-
     @ExceptionHandler(DataIntegrityViolationException.class)
     private ResponseEntity<String> handleException() {
         return ResponseEntity
@@ -48,5 +42,12 @@ public class ErrorHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new StateErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    private ResponseEntity<String> handleException(ConstraintViolationException e) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(HttpStatus.BAD_REQUEST + " " + e.getMessage());
     }
 }
