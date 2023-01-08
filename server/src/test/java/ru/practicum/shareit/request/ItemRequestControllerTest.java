@@ -82,42 +82,6 @@ public class ItemRequestControllerTest {
 
     @Test
     @SneakyThrows
-    public void createRequestWitchIncorrectUserId() {
-        //when
-        mvc.perform(
-                        post("/requests")
-                                .header("X-Sharer-User-Id", 0)
-                                .content(objectMapper.writeValueAsString(itemRequestDto))
-                                .contentType(MediaType.APPLICATION_JSON)
-                ).andDo(print())
-                //then
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(itemRequestService, times(0)).createItemRequest(any(ItemRequestDto.class), anyLong());
-    }
-
-    @Test
-    @SneakyThrows
-    public void createRequestWhenIncorrectDescription() {
-        //given
-        itemRequestDto.setDescription(" ");
-        //when
-        mvc.perform(
-                        post("/requests")
-                                .header("X-Sharer-User-Id", 0)
-                                .content(objectMapper.writeValueAsString(itemRequestDto))
-                                .contentType(MediaType.APPLICATION_JSON)
-                ).andDo(print())
-                //then
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(itemRequestService, times(0)).createItemRequest(any(ItemRequestDto.class), anyLong());
-    }
-
-    @Test
-    @SneakyThrows
     public void getPrivateRequests() {
         //given
         requestDtoResponseWithMD.setItems(Set.of(itemDataForRequestDto));
@@ -136,54 +100,6 @@ public class ItemRequestControllerTest {
                         status().isOk(),
                         content().json(objectMapper.writeValueAsString(itemRequestListDto))
                 );
-    }
-
-    @Test
-    @SneakyThrows
-    public void getPrivateRequestsWithIncorrectUserId() {
-        //when
-        mvc.perform(
-                        get("/requests")
-                                .header("X-Sharer-User-Id", 0)
-                                .param("from", "0")
-                                .param("size", "2")
-                ).andDo(print())
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(itemRequestService, times(0)).getPrivateRequests(any(PageRequest.class), anyLong());
-    }
-
-    @Test
-    @SneakyThrows
-    public void getPrivateRequestsWithIncorrectParamFrom() {
-        //when
-        mvc.perform(
-                        get("/requests")
-                                .header("X-Sharer-User-Id", 1)
-                                .param("from", "-1")
-                                .param("size", "2")
-                ).andDo(print())
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(itemRequestService, times(0)).getPrivateRequests(any(PageRequest.class), anyLong());
-    }
-
-    @Test
-    @SneakyThrows
-    public void getPrivateRequestsWithIncorrectParamSize() {
-        //when
-        mvc.perform(
-                        get("/requests")
-                                .header("X-Sharer-User-Id", 1)
-                                .param("from", "0")
-                                .param("size", "-1")
-                ).andDo(print())
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(itemRequestService, times(0)).getPrivateRequests(any(PageRequest.class), anyLong());
     }
 
     @Test
@@ -210,57 +126,6 @@ public class ItemRequestControllerTest {
 
     @Test
     @SneakyThrows
-    public void getOtherRequestsWitchIncorrectUserId() {
-        //when
-        mvc.perform(
-                        get("/requests/all")
-                                .header("X-Sharer-User-Id", 0)
-                                .param("from", "0")
-                                .param("size", "2")
-                ).andDo(print())
-                .andExpectAll(
-                        //then
-                        status().isBadRequest()
-                );
-        verify(itemRequestService, times(0)).getOtherRequests(any(PageRequest.class), anyLong());
-    }
-
-    @Test
-    @SneakyThrows
-    public void getOtherRequestsWitchIncorrectParamFrom() {
-        //when
-        mvc.perform(
-                        get("/requests/all")
-                                .header("X-Sharer-User-Id", 1)
-                                .param("from", "-1")
-                                .param("size", "2")
-                ).andDo(print())
-                .andExpectAll(
-                        //then
-                        status().isBadRequest()
-                );
-        verify(itemRequestService, times(0)).getOtherRequests(any(PageRequest.class), anyLong());
-    }
-
-    @Test
-    @SneakyThrows
-    public void getOtherRequestsWitchIncorrectParamSize() {
-        //when
-        mvc.perform(
-                        get("/requests/all")
-                                .header("X-Sharer-User-Id", 1)
-                                .param("from", "0")
-                                .param("size", "24343")
-                ).andDo(print())
-                .andExpectAll(
-                        //then
-                        status().isBadRequest()
-                );
-        verify(itemRequestService, times(0)).getOtherRequests(any(PageRequest.class), anyLong());
-    }
-
-    @Test
-    @SneakyThrows
     public void getItemRequest() {
         //given
         requestDtoResponseWithMD.setItems(Set.of(itemDataForRequestDto));
@@ -276,33 +141,4 @@ public class ItemRequestControllerTest {
                 );
     }
 
-    @Test
-    @SneakyThrows
-    public void getItemRequestWitchIncorrectUserId() {
-        //when
-        mvc.perform(
-                        get("/requests/1")
-                                .header("X-Sharer-User-Id", 0)
-                ).andDo(print())
-                .andExpectAll(
-                        //then
-                        status().isBadRequest()
-                );
-        verify(itemRequestService, times(0)).getItemRequest(anyLong(), anyLong());
-    }
-
-    @Test
-    @SneakyThrows
-    public void getItemRequestWitchIncorrectItemRequestId() {
-        //when
-        mvc.perform(
-                        get("/requests/0")
-                                .header("X-Sharer-User-Id", 1)
-                ).andDo(print())
-                .andExpectAll(
-                        //then
-                        status().isBadRequest()
-                );
-        verify(itemRequestService, times(0)).getItemRequest(anyLong(), anyLong());
-    }
 }

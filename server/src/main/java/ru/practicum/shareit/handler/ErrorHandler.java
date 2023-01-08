@@ -18,23 +18,24 @@ public class ErrorHandler {
 
     @ExceptionHandler(ResponseStatusException.class)
     private ResponseEntity<String> handleException(ResponseStatusException e) {
+        String message = e.getMessage().replace(e.getStatus().toString(), "");
         return ResponseEntity
                 .status(e.getStatus())
-                .body(e.getMessage());
+                .body(message);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     private ResponseEntity<String> handleException(MethodArgumentNotValidException e) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(HttpStatus.BAD_REQUEST + " " + e.getFieldError().getDefaultMessage());
+                .body(e.getFieldError().getDefaultMessage());
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     private ResponseEntity<String> handleException() {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(HttpStatus.INTERNAL_SERVER_ERROR + " Нарушение уникального индекса или первичного ключа");
+                .body(" Нарушение уникального индекса или первичного ключа");
     }
 
     @ExceptionHandler(StateException.class)

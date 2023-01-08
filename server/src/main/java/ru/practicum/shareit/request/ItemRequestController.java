@@ -6,15 +6,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestDtoResponse;
 import ru.practicum.shareit.request.dto.ItemRequestListDto;
 import ru.practicum.shareit.request.dto.RequestDtoResponseWithMD;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
 /**
@@ -22,23 +19,23 @@ import javax.validation.constraints.Min;
  */
 @RestController
 @RequestMapping("/requests")
-@Validated
+//@Validated
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ItemRequestController {
     private final ItemRequestService itemRequestService;
 
     @PostMapping
-    public ResponseEntity<ItemRequestDtoResponse> createRequest(@RequestHeader("X-Sharer-User-Id") @Min(1) Long requesterId,
-                                                                @RequestBody @Valid ItemRequestDto itemRequestDto) {
+    public ResponseEntity<ItemRequestDtoResponse> createRequest(@RequestHeader("X-Sharer-User-Id") Long requesterId,
+                                                                @RequestBody ItemRequestDto itemRequestDto) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(itemRequestService.createItemRequest(itemRequestDto, requesterId));
     }
 
     @GetMapping
     public ResponseEntity<ItemRequestListDto> getPrivateRequests(
-            @RequestHeader("X-Sharer-User-Id") @Min(1) Long requesterId,
-            @RequestParam(value = "from", defaultValue = "0") @Min(0) Integer from,
-            @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(20) Integer size) {
+            @RequestHeader("X-Sharer-User-Id") Long requesterId,
+            @RequestParam(value = "from", defaultValue = "0") Integer from,
+            @RequestParam(value = "size", defaultValue = "10") Integer size) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(itemRequestService.getPrivateRequests(
                         PageRequest.of(from / size, size).withSort(Sort.by("created").descending()),
@@ -48,8 +45,8 @@ public class ItemRequestController {
     @GetMapping("all")
     public ResponseEntity<ItemRequestListDto> getOtherRequests(
             @RequestHeader("X-Sharer-User-Id") @Min(1) Long requesterId,
-            @RequestParam(value = "from", defaultValue = "0") @Min(0) Integer from,
-            @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(20) Integer size) {
+            @RequestParam(value = "from", defaultValue = "0") Integer from,
+            @RequestParam(value = "size", defaultValue = "10") Integer size) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(itemRequestService.getOtherRequests(
                         PageRequest.of(
@@ -59,8 +56,8 @@ public class ItemRequestController {
 
     @GetMapping("{requestId}")
     public ResponseEntity<RequestDtoResponseWithMD> getItemRequest(
-            @RequestHeader("X-Sharer-User-Id") @Min(1) Long userId,
-            @PathVariable @Min(1) Long requestId) {
+            @RequestHeader("X-Sharer-User-Id") Long userId,
+            @PathVariable Long requestId) {
         return ResponseEntity.status(HttpStatus.OK).body(itemRequestService.getItemRequest(userId, requestId));
     }
 }

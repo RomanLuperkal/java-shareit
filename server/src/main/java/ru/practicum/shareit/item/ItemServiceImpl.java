@@ -68,13 +68,10 @@ public class ItemServiceImpl implements ItemService {
         if (item.getOwner().getId().equals(userId)) {
             itemDtoResponse.setLastBooking(mapper
                     .mapToBookingShortDto(bookings
-                            .findFirstByItemIdAndEndBeforeAndStatusOrderByEndDesc(
-                                    itemId, LocalDateTime.now(), Status.APPROVED).orElse(null) //я переделал на optional но тут нужен конкретно null при отсутсвии букинга
+                            .findFirstByItemAndStatusIsOrderByStartAsc(item, Status.APPROVED)
                     ));
             itemDtoResponse.setNextBooking(mapper.mapToBookingShortDto(bookings
-                    .findFirstByItemIdAndStartAfterAndStatusOrderByStartAsc(
-                            itemId, LocalDateTime.now(), Status.APPROVED).orElse(null)
-            ));
+                    .findFirstByItemAndStatusIsOrderByEndDesc(item, Status.APPROVED)));
             return itemDtoResponse;
         }
         return itemDtoResponse;
@@ -86,15 +83,16 @@ public class ItemServiceImpl implements ItemService {
         if (!users.existsById(userId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователя с id=" + userId + " не существует");
         }
-        List<ItemDtoResponse> personalItems = items.findAllByOwnerId(pageable, userId).stream()
-                .map(mapper::mapToItemDtoResponse).collect(Collectors.toList());
-        for (ItemDtoResponse item : personalItems) {
-            item.setLastBooking(mapper.mapToBookingShortDto(bookings.findFirstByItemIdAndEndBeforeAndStatusOrderByEndDesc(
-                    item.getId(), LocalDateTime.now(), Status.APPROVED).orElse(null)));
-            item.setNextBooking(mapper.mapToBookingShortDto(bookings
-                    .findFirstByItemIdAndStartAfterAndStatusOrderByStartAsc(
-                            item.getId(), LocalDateTime.now(), Status.APPROVED).orElse(null)
-            ));
+        List <Item> findItems = items.findAllByOwnerId(pageable, userId);
+        List<ItemDtoResponse> personalItems = new ArrayList<>();
+        for (Item item : findItems) {
+            ItemDtoResponse itemDtoResponse = mapper.mapToItemDtoResponse(item);
+            itemDtoResponse.setLastBooking(mapper.mapToBookingShortDto(
+                    bookings.findFirstByItemAndStatusIsOrderByStartAsc(item, Status.APPROVED)));
+            itemDtoResponse.setNextBooking(mapper.mapToBookingShortDto(
+                    bookings.findFirstByItemAndStatusIsOrderByEndDesc(item, Status.APPROVED)));
+            personalItems.add(itemDtoResponse);
+
         }
         return ItemListDto.builder().items(personalItems).build();
     }

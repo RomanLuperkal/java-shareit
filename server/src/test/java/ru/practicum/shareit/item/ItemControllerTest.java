@@ -73,99 +73,6 @@ public class ItemControllerTest {
 
     @SneakyThrows
     @Test
-    public void createItemWithIncorrectUserId() {
-        //when
-        mvc.perform(
-                        post("/items")
-                                .header("X-Sharer-User-Id", 0)
-                                .content(objectMapper.writeValueAsString(item1))
-                                .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                //then
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(itemService, times(0)).createItem(any(ItemDto.class), anyLong());
-    }
-
-    @SneakyThrows
-    @Test
-    public void createItemWithIncorrectName() {
-        //given
-        item1.setName("  test name");
-        //when
-        mvc.perform(
-                        post("/items")
-                                .header("X-Sharer-User-Id", 1)
-                                .content(objectMapper.writeValueAsString(item1))
-                                .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                //then
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(itemService, times(0)).createItem(any(ItemDto.class), anyLong());
-    }
-
-    @SneakyThrows
-    @Test
-    public void createItemWithIncorrectDescription() {
-        //given
-        item1.setDescription("  test description");
-        //when
-        mvc.perform(
-                        post("/items")
-                                .header("X-Sharer-User-Id", 1)
-                                .content(objectMapper.writeValueAsString(item1))
-                                .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                //then
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(itemService, times(0)).createItem(any(ItemDto.class), anyLong());
-    }
-
-    @SneakyThrows
-    @Test
-    public void createItemWithIncorrectAvailable() {
-        //given
-        item1.setAvailable(null);
-        //when
-        mvc.perform(
-                        post("/items")
-                                .header("X-Sharer-User-Id", 1)
-                                .content(objectMapper.writeValueAsString(item1))
-                                .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                //then
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(itemService, times(0)).createItem(any(ItemDto.class), anyLong());
-    }
-
-    @SneakyThrows
-    @Test
-    public void createItemWithIncorrectIdRequest() {
-        //given
-        item1.setRequestId(0L);
-        //when
-        mvc.perform(
-                        post("/items")
-                                .header("X-Sharer-User-Id", 1)
-                                .content(objectMapper.writeValueAsString(item1))
-                                .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                //then
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(itemService, times(0)).createItem(any(ItemDto.class), anyLong());
-    }
-
-    @SneakyThrows
-    @Test
     public void updateItem() {
         //given
         itemDtoResponse.setName(itemDtoUpdate.getName());
@@ -187,78 +94,6 @@ public class ItemControllerTest {
 
     @SneakyThrows
     @Test
-    public void updateItemWithIncorrectUserId() {
-        //when
-        mvc.perform(
-                        patch("/items/1")
-                                .header("X-Sharer-User-Id", 0)
-                                .content(objectMapper.writeValueAsString(item1))
-                                .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                //then
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(itemService, times(0)).updateItem(anyLong(), anyLong(), any(ItemDtoUpdate.class));
-    }
-
-    @SneakyThrows
-    @Test
-    public void updateItemWithIncorrectItemId() {
-        //when
-        mvc.perform(
-                        patch("/items/0")
-                                .header("X-Sharer-User-Id", 1)
-                                .content(objectMapper.writeValueAsString(item1))
-                                .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                //then
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(itemService, times(0)).updateItem(anyLong(), anyLong(), any(ItemDtoUpdate.class));
-    }
-
-    @SneakyThrows
-    @Test
-    public void updateItemWithIncorrectName() {
-        //given
-        itemDtoUpdate.setName("    updated name");
-        //when
-        mvc.perform(
-                        patch("/items/0")
-                                .header("X-Sharer-User-Id", 1)
-                                .content(objectMapper.writeValueAsString(item1))
-                                .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                //then
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(itemService, times(0)).updateItem(anyLong(), anyLong(), any(ItemDtoUpdate.class));
-    }
-
-    @SneakyThrows
-    @Test
-    public void updateItemWithIncorrectDescription() {
-        //given
-        itemDtoUpdate.setDescription("   updated description");
-        //when
-        mvc.perform(
-                        patch("/items/0")
-                                .header("X-Sharer-User-Id", 1)
-                                .content(objectMapper.writeValueAsString(item1))
-                                .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                //then
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(itemService, times(0)).updateItem(anyLong(), anyLong(), any(ItemDtoUpdate.class));
-    }
-
-    @SneakyThrows
-    @Test
     public void getItemById() {
         //when
         when(itemService.getItemByItemId(anyLong(), anyLong())).thenReturn(itemDtoResponse);
@@ -271,36 +106,6 @@ public class ItemControllerTest {
                         status().isOk(),
                         content().json(objectMapper.writeValueAsString(itemDtoResponse))
                 );
-    }
-
-    @SneakyThrows
-    @Test
-    public void getItemByIdWithIncorrectUserId() {
-        //when
-        mvc.perform(
-                        get("/items/1")
-                                .header("X-Sharer-User-Id", 0))
-                .andDo(print())
-                //then
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(itemService, times(0)).getItemByItemId(anyLong(), anyLong());
-    }
-
-    @SneakyThrows
-    @Test
-    public void getItemByIncorrectId() {
-        //when
-        mvc.perform(
-                        get("/items/0")
-                                .header("X-Sharer-User-Id", 1))
-                .andDo(print())
-                //then
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(itemService, times(0)).getItemByItemId(anyLong(), anyLong());
     }
 
     @SneakyThrows
@@ -323,51 +128,6 @@ public class ItemControllerTest {
 
     @SneakyThrows
     @Test
-    public void getPersonalItemsWithIncorrectUserId() {
-        //when
-        mvc.perform(
-                        get("/items")
-                                .param("from","0")
-                                .param("size","1")
-                                .header("X-Sharer-User-Id", 0))
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(itemService, times(0)).getPersonalItems(any(Pageable.class), anyLong());
-    }
-
-    @SneakyThrows
-    @Test
-    public void getPersonalItemsWithIncorrectParamFrom() {
-        //when
-        mvc.perform(
-                        get("/items")
-                                .param("from","-1")
-                                .param("size","1")
-                                .header("X-Sharer-User-Id", 1))
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(itemService, times(0)).getPersonalItems(any(Pageable.class), anyLong());
-    }
-
-    @SneakyThrows
-    @Test
-    public void getPersonalItemsWithIncorrectParamSize() {
-        //when
-        mvc.perform(
-                        get("/items")
-                                .param("from","0")
-                                .param("size","99999")
-                                .header("X-Sharer-User-Id", 1))
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(itemService, times(0)).getPersonalItems(any(Pageable.class), anyLong());
-    }
-
-    @SneakyThrows
-    @Test
     public void getFoundItems() {
         //given
         var itemListDto = ItemListDto.builder().items(List.of(itemDtoResponse)).build();
@@ -382,36 +142,6 @@ public class ItemControllerTest {
                         status().isOk(),
                         content().json(objectMapper.writeValueAsString(itemListDto))
                 );
-    }
-
-    @SneakyThrows
-    @Test
-    public void getFoundItemsWitchIncorrectParamFrom() {
-        //when
-        mvc.perform(
-                        get("/items/search")
-                                .param("from","-1")
-                                .param("size","1")
-                                .param("text", "description"))
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(itemService,times(0)).getFoundItems(any(Pageable.class), anyString());
-    }
-
-    @SneakyThrows
-    @Test
-    public void getFoundItemsWitchIncorrectParamSize() {
-        //when
-        mvc.perform(
-                        get("/items/search")
-                                .param("from","0")
-                                .param("size","0")
-                                .param("text", "description"))
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(itemService,times(0)).getFoundItems(any(Pageable.class), anyString());
     }
 
     @SneakyThrows
@@ -442,66 +172,4 @@ public class ItemControllerTest {
                 );
     }
 
-    @SneakyThrows
-    @Test
-    public void addCommentWithEmptyText() {
-        //given
-        var comment = CommentDto.builder()
-                .text("     ")
-                .build();
-        //when
-        mvc.perform(
-                        post("/items/1/comment")
-                                .header("X-Sharer-User-Id", 1)
-                                .content(objectMapper.writeValueAsString(comment))
-                                .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                //then
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(itemService, times(0)).addComment(anyLong(), anyLong(), any(CommentDto.class));
-    }
-
-    @SneakyThrows
-    @Test
-    public void addCommentWithIncorrectItemId() {
-        //given
-        var comment = CommentDto.builder()
-                .text("     ")
-                .build();
-        //when
-        mvc.perform(
-                        post("/items/0/comment")
-                                .header("X-Sharer-User-Id", 1)
-                                .content(objectMapper.writeValueAsString(comment))
-                                .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                //then
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(itemService, times(0)).addComment(anyLong(), anyLong(), any(CommentDto.class));
-    }
-
-    @SneakyThrows
-    @Test
-    public void addCommentWithIncorrectUserId() {
-        //given
-        var comment = CommentDto.builder()
-                .text("     ")
-                .build();
-        //when
-        mvc.perform(
-                        post("/items/1/comment")
-                                .header("X-Sharer-User-Id", 0)
-                                .content(objectMapper.writeValueAsString(comment))
-                                .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                //then
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(itemService, times(0)).addComment(anyLong(), anyLong(), any(CommentDto.class));
-    }
 }

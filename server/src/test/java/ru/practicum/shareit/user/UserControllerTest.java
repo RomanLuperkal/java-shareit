@@ -86,39 +86,6 @@ public class UserControllerTest {
     }
 
     @Test
-    public void createUserWithIncorrectName() throws Exception {
-        UserDto userDtoWithIncorrectName = UserDto.builder()
-                .name("  incorrect name")
-                .build();
-        mvc.perform(post("/users")
-                        .content(objectMapper.writeValueAsString(userDtoWithIncorrectName))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                //then
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(userService, times(0)).createUser(any(UserDto.class));
-    }
-
-    @Test
-    public void createUserWithIncorrectEmail() throws Exception {
-        UserDto userDtoWithIncorrectEmail = UserDto.builder()
-                .name("test name")
-                .email("incorrect-email@.ru")
-                .build();
-        mvc.perform(post("/users")
-                        .content(objectMapper.writeValueAsString(userDtoWithIncorrectEmail))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                //then
-                .andExpectAll(
-                        status().isBadRequest()
-                );
-        verify(userService, times(0)).createUser(any(UserDto.class));
-    }
-
-    @Test
     public void getUserById() throws Exception {
         when(userService.getUserById(anyLong())).thenReturn(userDtoResponse);
         //when
@@ -140,18 +107,6 @@ public class UserControllerTest {
                 //then
                 .andExpectAll(
                         status().isNotFound()
-                );
-    }
-
-    @Test
-    public void getUserByIncorrectId() throws Exception {
-        when(userService.getUserById(anyLong())).thenReturn(userDtoResponse);
-        //when
-        mvc.perform(get("/users/-1"))
-                .andDo(print())
-                //then
-                .andExpectAll(
-                        status().isBadRequest()
                 );
     }
 

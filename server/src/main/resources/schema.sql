@@ -1,8 +1,4 @@
-DROP TABLE IF EXISTS users CASCADE;
-DROP TABLE IF EXISTS items CASCADE;
-DROP TABLE IF EXISTS requests CASCADE;
-DROP TABLE IF EXISTS bookings CASCADE;
-DROP TABLE IF EXISTS comments CASCADE;
+DROP TABLE IF EXISTS comments, requests, bookings, items, users CASCADE ;
 
 CREATE TABLE IF NOT EXISTS users
 (
@@ -37,7 +33,7 @@ CREATE TABLE IF NOT EXISTS bookings
     end_date   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     item_id    BIGINT REFERENCES items (item_id) ON DELETE RESTRICT,
     booker_id  BIGINT REFERENCES users (user_id) ON DELETE RESTRICT,
-    status     enum ('WAITING', 'APPROVED', 'REJECTED', 'CANCELED')
+    status     varchar
 );
 
 CREATE TABLE IF NOT EXISTS comments
