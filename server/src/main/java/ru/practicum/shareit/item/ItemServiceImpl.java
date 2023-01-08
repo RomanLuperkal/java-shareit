@@ -83,7 +83,7 @@ public class ItemServiceImpl implements ItemService {
         if (!users.existsById(userId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователя с id=" + userId + " не существует");
         }
-        List <Item> findItems = items.findAllByOwnerId(pageable, userId);
+        List<Item> findItems = items.findAllByOwnerId(pageable, userId);
         List<ItemDtoResponse> personalItems = new ArrayList<>();
         for (Item item : findItems) {
             ItemDtoResponse itemDtoResponse = mapper.mapToItemDtoResponse(item);

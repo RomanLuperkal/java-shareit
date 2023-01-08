@@ -35,6 +35,7 @@ public interface BookingRepository extends PagingAndSortingRepository<Booking, L
 
     List<Booking> findAllByItemIdInAndStatusIsOrderByStartDesc(
             Pageable pageable, Collection<Long> itemId, Status status);
+
     Booking findFirstByItemAndStatusIsOrderByStartAsc(Item item, Status status); // постман требует от меня null
 
     Booking findFirstByItemAndStatusIsOrderByEndDesc(Item item, Status status);
