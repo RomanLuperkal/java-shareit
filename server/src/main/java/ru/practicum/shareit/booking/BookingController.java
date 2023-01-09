@@ -22,7 +22,7 @@ public class BookingController {
 
     @PostMapping
     public ResponseEntity<BookingDtoResponse> createBooking(@RequestHeader("X-Sharer-User-Id") Long bookerId,
-            /*@Valid*/ @RequestBody BookingDto bookingDto) {
+                                                            @RequestBody BookingDto bookingDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(bookingService.createBooking(bookerId, bookingDto));
     }
 
@@ -53,7 +53,7 @@ public class BookingController {
 
     @GetMapping("owner")
     public ResponseEntity<BookingListDto> getAllBookingsForItemsUser(
-            @RequestHeader("X-Sharer-User-Id") /*@Min(1)*/ Long userId,
+            @RequestHeader("X-Sharer-User-Id") Long userId,
             @RequestParam(defaultValue = "ALL") String state,
             @RequestParam(value = "from", defaultValue = "0") Integer from,
             @RequestParam(value = "size", defaultValue = "10") Integer size) {

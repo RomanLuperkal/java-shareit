@@ -12,14 +12,12 @@ import ru.practicum.shareit.request.dto.ItemRequestDtoResponse;
 import ru.practicum.shareit.request.dto.ItemRequestListDto;
 import ru.practicum.shareit.request.dto.RequestDtoResponseWithMD;
 
-import javax.validation.constraints.Min;
-
 /**
  * TODO Sprint add-item-requests.
  */
 @RestController
 @RequestMapping("/requests")
-//@Validated
+
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ItemRequestController {
     private final ItemRequestService itemRequestService;
@@ -44,7 +42,7 @@ public class ItemRequestController {
 
     @GetMapping("all")
     public ResponseEntity<ItemRequestListDto> getOtherRequests(
-            @RequestHeader("X-Sharer-User-Id") @Min(1) Long requesterId,
+            @RequestHeader("X-Sharer-User-Id") Long requesterId,
             @RequestParam(value = "from", defaultValue = "0") Integer from,
             @RequestParam(value = "size", defaultValue = "10") Integer size) {
         return ResponseEntity.status(HttpStatus.OK)
