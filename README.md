@@ -27,4 +27,4 @@
     * Cоздание\получение информации о запросах на бронирование предмета
 
 3. ### ER диаграмма базы данных приложения:
-![ER_diagram_for_filmorate](/assets/images/shareit-ER diagramm.png)
+![ER_diagram_for_shareit](/assets/images/shareit-ER-diagramm.png)
