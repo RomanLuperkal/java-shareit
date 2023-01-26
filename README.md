@@ -28,3 +28,16 @@
 
 3. ### ER диаграмма базы данных приложения:
 ![ER_diagram_for_shareit](/assets/images/shareit-ER-diagramm.png)
+Инструкция по запуску:
+
+1. Для работы сервисов server и gateway необходима запущенная бд Postgres. С помощью pgAdmin4 создайте базу
+   данных:
+   Необходимо создать базу данных postgreSQL _**shareit**_:
+   * POSTGRES_USER = root
+   * POSTGRES_PASSWORD = root
+   * POSTGRES_DB = shareit
+
+2. Для запуска проекта необходимы docker и docker-compose.
+3. Команда "docker-compose up" запускает оба сервиса с бд
+4. Для проверки работоспособности приложения предусмотрены тесты для приложения постман:
+   [shareit-tests](https://github.com/valikaev1989/java-shareit/blob/main/postmanTests/tests.json)  
