@@ -30,7 +30,7 @@
 ![ER_diagram_for_shareit](/assets/images/shareit-ER-diagramm.png)
 Инструкция по запуску:
 
-1. Для работы сервисов server и gateway необходима запущенная бд Postgres. 
+1. Для работы микросервисов server и gateway необходима запущенная бд Postgres. 
 2. С помощью pgAdmin4 необходимо создать базу данных postgreSQL _**shareit**_:
    * POSTGRES_USER = root
    * POSTGRES_PASSWORD = root
